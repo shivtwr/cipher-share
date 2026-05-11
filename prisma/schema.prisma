@@ -1,0 +1,45 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum FileState {
+  ACTIVE
+  EXPIRED
+}
+
+enum AuthType {
+  GOOGLE
+  EMAIL
+}
+
+model User {
+  id            String   @unique @default(uuid())
+  name          String
+  email         String   @unique
+  authType      AuthType
+  publicKey     String? // optional because not generated on signUp, but once user visits /transfer page
+  privateKey    String? // optional because not generated on signUp, but once user visits /transfer page
+  password      String?
+  picture       String?
+  sharedFiles   File[]   @relation("sender")
+  receivedFiles File[]   @relation("receiver")
+  createdAt     DateTime @default(now())
+}
+
+model File {
+  id             String    @unique @default(uuid())
+  name           String
+  key            String // AWS S3 key
+  size           String
+  sender         User      @relation("sender", fields: [senderEmail], references: [email])
+  recipient      User      @relation("receiver", fields: [recipientEmail], references: [email])
+  senderEmail    String
+  recipientEmail String
+  currentStatus  FileState @default(ACTIVE)
+  createdAt      DateTime  @default(now())
+}
