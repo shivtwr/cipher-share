@@ -1,5 +1,5 @@
 -- CreateEnum
-CREATE TYPE "FileState" AS ENUM ('ACTIVE', 'DELETED');
+CREATE TYPE "FileState" AS ENUM ('ACTIVE', 'EXPIRED');
 
 -- CreateEnum
 CREATE TYPE "AuthType" AS ENUM ('GOOGLE', 'EMAIL');
@@ -21,13 +21,12 @@ CREATE TABLE "User" (
 CREATE TABLE "File" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
-    "url" TEXT NOT NULL,
+    "key" TEXT NOT NULL,
     "size" TEXT NOT NULL,
-    "senderId" TEXT NOT NULL,
-    "receiverId" TEXT NOT NULL,
+    "senderEmail" TEXT NOT NULL,
+    "recipientEmail" TEXT NOT NULL,
     "currentStatus" "FileState" NOT NULL DEFAULT 'ACTIVE',
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "expiresAt" TIMESTAMP(3) NOT NULL
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 -- CreateIndex
@@ -40,7 +39,7 @@ CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 CREATE UNIQUE INDEX "File_id_key" ON "File"("id");
 
 -- AddForeignKey
-ALTER TABLE "File" ADD CONSTRAINT "File_senderId_fkey" FOREIGN KEY ("senderId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "File" ADD CONSTRAINT "File_senderEmail_fkey" FOREIGN KEY ("senderEmail") REFERENCES "User"("email") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "File" ADD CONSTRAINT "File_receiverId_fkey" FOREIGN KEY ("receiverId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "File" ADD CONSTRAINT "File_recipientEmail_fkey" FOREIGN KEY ("recipientEmail") REFERENCES "User"("email") ON DELETE RESTRICT ON UPDATE CASCADE;
